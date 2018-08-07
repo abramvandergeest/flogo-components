@@ -163,12 +163,12 @@ func (oF objectField) norming() objectField {
 	return oF
 }
 
-func objs2features(o1 objectField, o2 objectField) map[string]float64 { // oF to feature vector
-	out := make(map[string]float64)
+func objs2features(o1 objectField, o2 objectField) map[string]interface{} { // oF to feature vector
+	out := make(map[string]interface{})
 
 	// vecs should only be normed after diff is calculated
 	out["diff"], _ = diff(o1.vec, o2.vec)
-	out["testing"] = 2342.3
+	out["map"] = 0
 
 	if !o1.vecsNormed {
 		o1 = o1.norming()

@@ -14,9 +14,10 @@ import (
 	"github.com/TIBCOSoftware/flogo-lib/engine"
 	"github.com/TIBCOSoftware/flogo-lib/flogo"
 	"github.com/TIBCOSoftware/flogo-lib/logger"
-	"github.com/abramvandergeest/flogo-components/activity/inference"
 
 	// "github.com/abramvandergeest/flogo-components/activity/inference"
+
+	"github.com/abramvandergeest/flogo-components/activity/inference"
 	"github.com/retgits/flogo-components/activity/randomnumber"
 )
 
@@ -61,14 +62,15 @@ func handler(ctx context.Context, inputs map[string]*data.Attribute) (map[string
 	obj1 = obj1.embedding()
 	obj2 = obj2.embedding()
 	features := objs2features(obj1, obj2)
-
-	fmt.Println(features)
+	// features["map"] = 0
+	// var features map[string]interface{}
 
 	// Get the ID from the path
 	id := inputs["pathParams"].Value().(map[string]string)["id"]
 
 	// Execute the log activity
 	in := map[string]interface{}{"message": id, "flowInfo": "true", "addToFlow": "true"}
+
 	_, err := flogo.EvalActivity(&log.LogActivity{}, in)
 	if err != nil {
 		return nil, err
@@ -80,16 +82,18 @@ func handler(ctx context.Context, inputs map[string]*data.Attribute) (map[string
 	// Generate a random number for the amount
 	// There are definitely better ways to do this with Go, but this keeps the flow consistent with the UI version
 	in = map[string]interface{}{"model": m, "inputName": inputName, "framework": framework, "features": features}
-	in = map[string]interface{}{"min": 0, "max": 2000}
+	// in = make(map[string]interface{})
+	// in = map[string]interface{}{"min": 0, "max": 2000}
 	// fmt.Println(in["model"])
+	fmt.Println(in)
 	out, err := flogo.EvalActivity(&inference.InferenceActivity{}, in)
 	fmt.Println(err)
 	if err != nil {
 		return nil, err
 	}
 	amount := strconv.Itoa(out["result"].Value().(int))
-
-	// Instead of using the combine activity we'll concat the strings together
+	// amount := "100"
+	// // Instead of using the combine activity we'll concat the strings together
 	ref := fmt.Sprintf("INV-%v", id)
 
 	// Generate a random number for the balance
