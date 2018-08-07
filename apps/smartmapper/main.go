@@ -7,13 +7,16 @@ import (
 	"os"
 	"strconv"
 
+	// "github.com/TIBCOSoftware/flogo-contrib/activity/inference"
 	"github.com/TIBCOSoftware/flogo-contrib/activity/log"
-	"github.com/TIBCOSoftware/flogo-contrib/activity/rest"
 	rt "github.com/TIBCOSoftware/flogo-contrib/trigger/rest"
 	"github.com/TIBCOSoftware/flogo-lib/core/data"
 	"github.com/TIBCOSoftware/flogo-lib/engine"
 	"github.com/TIBCOSoftware/flogo-lib/flogo"
 	"github.com/TIBCOSoftware/flogo-lib/logger"
+	"github.com/abramvandergeest/flogo-components/activity/inference"
+
+	// "github.com/abramvandergeest/flogo-components/activity/inference"
 	"github.com/retgits/flogo-components/activity/randomnumber"
 )
 
@@ -53,6 +56,14 @@ func appBuilder() *flogo.App {
 }
 
 func handler(ctx context.Context, inputs map[string]*data.Attribute) (map[string]*data.Attribute, error) {
+	obj1 := objectField{name: "testingNameHere", label: "labeledDescription-Hi", fieldType: "STRING", fieldLength: 128}
+	obj2 := objectField{name: "Phone", label: "mobilePhone", fieldType: "STRING", fieldLength: 128}
+	obj1 = obj1.embedding()
+	obj2 = obj2.embedding()
+	features := objs2features(obj1, obj2)
+
+	fmt.Println(features)
+
 	// Get the ID from the path
 	id := inputs["pathParams"].Value().(map[string]string)["id"]
 
@@ -62,11 +73,17 @@ func handler(ctx context.Context, inputs map[string]*data.Attribute) (map[string
 	if err != nil {
 		return nil, err
 	}
+	m := "/Users/avanders/working/working_python/Smart_mapper/Archive.zip"
+	inputName := "inputs"
+	framework := "Tensorflow"
 
 	// Generate a random number for the amount
 	// There are definitely better ways to do this with Go, but this keeps the flow consistent with the UI version
-	in = map[string]interface{}{"min": 1000, "max": 2000}
-	out, err := flogo.EvalActivity(&randomnumber.MyActivity{}, in)
+	in = map[string]interface{}{"model": m, "inputName": inputName, "framework": framework, "features": features}
+	in = map[string]interface{}{"min": 0, "max": 2000}
+	// fmt.Println(in["model"])
+	out, err := flogo.EvalActivity(&inference.InferenceActivity{}, in)
+	fmt.Println(err)
 	if err != nil {
 		return nil, err
 	}
@@ -84,13 +101,6 @@ func handler(ctx context.Context, inputs map[string]*data.Attribute) (map[string
 	}
 	balance := strconv.Itoa(out["result"].Value().(int))
 
-	// Call out to another service
-	in = map[string]interface{}{"method": "GET", "uri": fmt.Sprintf("%s%s", paymentservice, id)}
-	logger.Info(in)
-	out, err = flogo.EvalActivity(&rest.RESTActivity{}, in)
-	if err != nil {
-		return nil, err
-	}
 	//expectedDate := out["data"].Value().(map[string]interface{})["expectedDate"].(string)
 
 	// The return message is a map[string]*data.Attribute which we'll have to construct

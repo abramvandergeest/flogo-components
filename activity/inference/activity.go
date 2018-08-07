@@ -46,6 +46,7 @@ func (a *InferenceActivity) Metadata() *activity.Metadata {
 // Eval implements api.Activity.Eval - Runs an ML model
 func (a *InferenceActivity) Eval(context activity.Context) (done bool, err error) {
 
+	fmt.Println("GETS HERE IN INFERENCE")
 	modelName := context.GetInput(ivModel).(string)
 	inputName := context.GetInput(ivInputName).(string)
 	features := context.GetInput(ivFeatures)
