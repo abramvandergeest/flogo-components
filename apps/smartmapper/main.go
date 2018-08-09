@@ -54,7 +54,7 @@ func appBuilder() *flogo.App {
 	// Register the HTTP trigger
 	trg := app.NewTrigger(&rt.RestTrigger{}, map[string]interface{}{"port": port})
 	// trg.NewFuncHandler(map[string]interface{}{"method": "GET", "path": "/api/invoices/:id"}, handler)
-	trg.NewFuncHandler(map[string]interface{}{"method": "POST", "path": "/api/invoices"}, handler)
+	trg.NewFuncHandler(map[string]interface{}{"method": "POST", "path": "/api"}, handler)
 
 	return app
 }

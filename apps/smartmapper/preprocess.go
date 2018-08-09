@@ -11,11 +11,13 @@ import (
 	"strings"
 )
 
+// defining my regex search parameters
 var camel = regexp.MustCompile("(^[^A-Z0-9]*|[A-Z0-9]*)([A-Z0-9][^A-Z]+|$)")
 var altspace = regexp.MustCompile("_|-|\\.|/")
 var badchar = regexp.MustCompile("[\\[\\]()\\&\\?$]")
 var regID = regexp.MustCompile("ID")
 
+// Cleaning a Label into something usable
 func camel2Space(s string) string {
 	// https://gist.github.com/vermotr/dd9cfe74169234ef7380e8f32a8fbce9
 	var a []string
@@ -43,6 +45,7 @@ func string2List(s string) []string {
 	return strings.Fields(cleanString(s))
 }
 
+//Loading the glove vector from file to dictionary
 func loadGloveModel(gfile string) map[string][]float64 {
 	gdic := make(map[string][]float64)
 
@@ -75,12 +78,15 @@ func loadGloveModel(gfile string) map[string][]float64 {
 	return gdic
 }
 
+// Defining basic values for glove file
 var gfile = "/Users/avanders/glove/glove_twitter/glove.twitter.27B.25d.txt"
 
 const dim int = 25
 
+// Load the glove vector dictionary
 var gdic = loadGloveModel(gfile)
 
+// adding two vectors together
 func addVecs(a []float64, b []float64) []float64 {
 	la := len(a)
 	lb := len(b)
@@ -98,6 +104,7 @@ func addVecs(a []float64, b []float64) []float64 {
 	return nil
 }
 
+//  getting the embedded word value summed - not normed because that is done later
 func getembed(s string) []float64 {
 	var a []float64
 	for _, word := range string2List(s) {
@@ -107,6 +114,7 @@ func getembed(s string) []float64 {
 	return a
 }
 
+//finding the difference between two vectors with edge cases for the word embeddnig values
 func diff(svec []float64, tvec []float64) (mag float64, err error) {
 	lt := len(tvec)
 	ls := len(svec)
@@ -130,7 +138,7 @@ func diff(svec []float64, tvec []float64) (mag float64, err error) {
 }
 
 // Above is functions not dependant on activity structure, below are
-
+//Creating a structure for the source and target of a mapping
 type objectField struct {
 	name        string
 	label       string
@@ -140,11 +148,13 @@ type objectField struct {
 	vecsNormed  bool
 }
 
+// assigned an embedding value to an objectField
 func (oF objectField) embedding() objectField {
 	oF.vec = getembed(oF.label)
 	return oF
 }
 
+// Normalizing a vector - 11 is from the max value of the embedded vecs
 func getNormedVec(vec []float64) []float64 {
 	gnorm := 11.
 
@@ -154,6 +164,7 @@ func getNormedVec(vec []float64) []float64 {
 	return vec
 }
 
+//  Applying gerNormedVec to an objectField's vec property
 func (oF objectField) norming() objectField {
 	// oF.vec = getembed(oF.label)
 	oF.vec = getNormedVec(oF.vec)
@@ -162,6 +173,7 @@ func (oF objectField) norming() objectField {
 	return oF
 }
 
+// Given two objectField objects convert it into the features for the machine learning model
 func objs2features(o1 objectField, o2 objectField) map[string]interface{} { // oF to feature vector
 	out := make(map[string]interface{})
 
@@ -189,48 +201,4 @@ func objs2features(o1 objectField, o2 objectField) map[string]interface{} { // o
 	}
 
 	return out
-}
-
-// func objs2features(o1 objectField, o2 objectField) (features map[string]float64, err error) {
-
-// 	return features, err
-// }
-
-type matchedResult struct {
-	o1name string
-	o2name string
-	score  float64
-}
-
-func otherFunc() {
-
-	var s string
-	// var err error
-	s = "helloLetsTalk$Today_and.tomorrow"
-
-	fmt.Println(string2List(s))
-	fmt.Println(string2List("Hi&How(_Are-You/_doing?"))
-	fmt.Println(string2List("result.company.industry"))
-	fmt.Println(string2List("result.company.industryIDBlah"))
-
-	// fmt.Println(gdic[strings.ToLower("Hello")])
-
-	// gnorm := 11. //This is the value to use to normalize the glove vectors
-	// This is applied after taking vector diff
-
-	t := "result.company.industryIDBlah"
-	tvec := getembed(t)
-	svec := getembed(s)
-	mag, _ := diff(tvec, svec)
-	fmt.Println(mag)
-
-	obj1 := objectField{name: "testingNameHere", label: "labeledDescription-Hi", fieldType: "STRING", fieldLength: 128}
-	obj1 = obj1.embedding()
-	obj2 := objectField{name: "Phone", label: "mobilePhone", fieldType: "STRING", fieldLength: 128}
-	obj2 = obj2.embedding()
-	fmt.Println(obj1)
-	obj1 = obj1.norming()
-	fmt.Println(obj1)
-
-	fmt.Println(objs2features(obj1, obj2))
 }
