@@ -84,18 +84,15 @@ func handler(ctx context.Context, inputs map[string]*data.Attribute) (map[string
 	if err != nil {
 		return nil, err
 	}
-	fmt.Println("Wish", srcobjs)
 
 	//Getting target objects from json string
 	trgobjs, err := jsonStr2Obj(inputs["queryParams"].Value().(map[string]string)["Target"])
 	if err != nil {
 		return nil, err
 	}
-	fmt.Println("FEAR", trgobjs)
 
 	// Get the ID from the path
 	id := inputs["queryParams"].Value().(map[string]string)["id"]
-	fmt.Println(id)
 
 	// Execute the log activity
 	// // // // I NEED TO LOG WHAT IS GOING ON!!!!!!
