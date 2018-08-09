@@ -65,7 +65,6 @@ func loadGloveModel(gfile string) map[string][]float64 {
 				num = append(num, i)
 			}
 		}
-		// fmt.Println(num)
 		gdic[l[0]] = num
 	}
 
@@ -167,7 +166,7 @@ func objs2features(o1 objectField, o2 objectField) map[string]interface{} { // o
 	out := make(map[string]interface{})
 
 	// vecs should only be normed after diff is calculated
-	out["diff"], _ = diff(o1.vec, o2.vec)
+	out["VEC_DIFF"], _ = diff(o1.vec, o2.vec)
 	out["map"] = 0
 
 	if !o1.vecsNormed {
