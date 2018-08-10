@@ -37,11 +37,6 @@ func main() {
 	engine.RunEngine(e)
 }
 
-type outrow struct {
-	TargetName string  `json:"targetName"`
-	Match      float64 `json:"match"`
-}
-
 func appBuilder() *flogo.App {
 	app := flogo.NewApp()
 
