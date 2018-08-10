@@ -3,7 +3,6 @@ package main
 
 import (
 	"context"
-	"encoding/json"
 	"fmt"
 	"os"
 	"strconv"
@@ -58,24 +57,6 @@ func appBuilder() *flogo.App {
 	trg.NewFuncHandler(map[string]interface{}{"method": "POST", "path": "/api"}, handler)
 
 	return app
-}
-
-func jsonStr2Obj(str string) (out []objectField, err error) {
-
-	var data []map[string]interface{}
-	err = json.Unmarshal([]byte(str), &data)
-	if err != nil {
-		return nil, err
-	}
-	for _, a := range data {
-		o := objectField{
-			name:        a["name"].(string),
-			label:       a["label"].(string),
-			fieldType:   a["type"].(string),
-			fieldLength: int32(a["type_length"].(float64))}
-		out = append(out, o)
-	}
-	return out, nil
 }
 
 func handler(ctx context.Context, inputs map[string]*data.Attribute) (map[string]*data.Attribute, error) {

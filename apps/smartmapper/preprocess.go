@@ -2,6 +2,7 @@ package main
 
 import (
 	"bufio"
+	"encoding/json"
 	"fmt"
 	"log"
 	"math"
@@ -201,4 +202,22 @@ func objs2features(o1 objectField, o2 objectField) map[string]interface{} { // o
 	}
 
 	return out
+}
+
+func jsonStr2Obj(str string) (out []objectField, err error) {
+
+	var data []map[string]interface{}
+	err = json.Unmarshal([]byte(str), &data)
+	if err != nil {
+		return nil, err
+	}
+	for _, a := range data {
+		o := objectField{
+			name:        a["name"].(string),
+			label:       a["label"].(string),
+			fieldType:   a["type"].(string),
+			fieldLength: int32(a["type_length"].(float64))}
+		out = append(out, o)
+	}
+	return out, nil
 }
