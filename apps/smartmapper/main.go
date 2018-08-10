@@ -141,9 +141,6 @@ func handler(ctx context.Context, inputs map[string]*data.Attribute) (map[string
 		output[obja.name] = listofcomps
 	}
 
-	fmt.Println("OUTPUT:", output)
-	fmt.Println("OUTPUT2:", output2)
-
 	// The return message is a map[string]*data.Attribute which we'll have to construct
 	response := make(map[string]interface{})
 	response["output"] = output2
