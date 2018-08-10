@@ -57,7 +57,7 @@ func appBuilder() *flogo.App {
 
 func handler(ctx context.Context, inputs map[string]*data.Attribute) (map[string]*data.Attribute, error) {
 
-	//Getting source objects from json string
+	//Getting source objects from json string - after cleaning/normalizing the strings
 	s := strings.Map(normStr, inputs["queryParams"].Value().(map[string]string)["Source"])
 	// fmt.Println(s)
 	srcobjs, err := jsonStr2Obj(s)
@@ -65,7 +65,7 @@ func handler(ctx context.Context, inputs map[string]*data.Attribute) (map[string
 		return nil, err
 	}
 
-	//Getting target objects from json string
+	//Getting target objects from json string - after cleaning/normalizing the strings
 	s = strings.Map(normStr, inputs["queryParams"].Value().(map[string]string)["Target"])
 	// fmt.Println(s)
 	trgobjs, err := jsonStr2Obj(s)
