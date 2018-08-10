@@ -226,3 +226,13 @@ func jsonStr2Obj(str string) (out []objectField, err error) {
 	}
 	return out, nil
 }
+
+func normStr(in rune) rune {
+	switch in {
+	case '“', '‹', '”', '›':
+		return '"'
+	case '‘', '’':
+		return '\''
+	}
+	return in
+}

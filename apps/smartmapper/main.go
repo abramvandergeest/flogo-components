@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"os"
 	"strconv"
+	"strings"
 
 	"github.com/TIBCOSoftware/flogo-contrib/activity/inference"
 	"github.com/TIBCOSoftware/flogo-contrib/activity/log"
@@ -20,7 +21,7 @@ import (
 var (
 	httpport       = os.Getenv("HTTPPORT")
 	paymentservice = os.Getenv("PAYMENTSERVICE")
-	model_path     = os.Getenv("SM_MODEL")
+	modelPath      = os.Getenv("SMMODEL")
 )
 
 func main() {
@@ -57,13 +58,17 @@ func appBuilder() *flogo.App {
 func handler(ctx context.Context, inputs map[string]*data.Attribute) (map[string]*data.Attribute, error) {
 
 	//Getting source objects from json string
-	srcobjs, err := jsonStr2Obj(inputs["queryParams"].Value().(map[string]string)["Source"])
+	s := strings.Map(normStr, inputs["queryParams"].Value().(map[string]string)["Source"])
+	// fmt.Println(s)
+	srcobjs, err := jsonStr2Obj(s)
 	if err != nil {
 		return nil, err
 	}
 
 	//Getting target objects from json string
-	trgobjs, err := jsonStr2Obj(inputs["queryParams"].Value().(map[string]string)["Target"])
+	s = strings.Map(normStr, inputs["queryParams"].Value().(map[string]string)["Target"])
+	// fmt.Println(s)
+	trgobjs, err := jsonStr2Obj(s)
 	if err != nil {
 		return nil, err
 	}
@@ -85,7 +90,7 @@ func handler(ctx context.Context, inputs map[string]*data.Attribute) (map[string
 	output2 := make(map[string][]interface{})
 
 	// Defining constant inference values
-	m := model_path
+	m := modelPath
 	inputName := "inputs"
 	framework := "Tensorflow"
 
