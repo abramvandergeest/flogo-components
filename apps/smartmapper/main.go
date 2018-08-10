@@ -21,6 +21,7 @@ import (
 var (
 	httpport       = os.Getenv("HTTPPORT")
 	paymentservice = os.Getenv("PAYMENTSERVICE")
+	model_path     = os.Getenv("SM_MODEL")
 )
 
 func main() {
@@ -108,7 +109,7 @@ func handler(ctx context.Context, inputs map[string]*data.Attribute) (map[string
 	output2 := make(map[string][]interface{})
 
 	// Defining constant inference values
-	m := "/Users/avanders/working/working_python/Smart_mapper/Archive.zip"
+	m := model_path
 	inputName := "inputs"
 	framework := "Tensorflow"
 
