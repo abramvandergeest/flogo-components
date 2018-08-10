@@ -19,9 +19,8 @@ import (
 )
 
 var (
-	httpport       = os.Getenv("HTTPPORT")
-	paymentservice = os.Getenv("PAYMENTSERVICE")
-	modelPath      = os.Getenv("SMMODEL")
+	httpport  = os.Getenv("HTTPPORT")
+	modelPath = os.Getenv("SMMODEL")
 )
 
 func main() {
