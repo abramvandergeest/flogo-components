@@ -10,7 +10,11 @@ import (
 	"regexp"
 	"strconv"
 	"strings"
+
+	lvs "github.com/texttheater/golang-levenshtein/levenshtein"
 )
+
+//go get github.com/texttheater/golang-levenshtein/levenshtein
 
 // defining my regex search parameters
 var camel = regexp.MustCompile("(^[^A-Z0-9]*|[A-Z0-9]*)([A-Z0-9][^A-Z]+|$)")
@@ -80,9 +84,9 @@ func loadGloveModel(gfile string) map[string][]float64 {
 }
 
 // Defining basic values for glove file
-var gfile = "/Users/avanders/glove/glove_twitter/glove.twitter.27B.25d.txt"
+var gfile = os.Getenv("GLOVEFILE") //"/Users/avanders/glove/glove_twitter/glove.twitter.27B.25d.txt"
 
-const dim int = 25
+// const dim int = 25
 
 // Load the glove vector dictionary
 var gdic = loadGloveModel(gfile)
@@ -178,9 +182,21 @@ func (oF objectField) norming() objectField {
 func objs2features(o1 objectField, o2 objectField) map[string]interface{} { // oF to feature vector
 	out := make(map[string]interface{})
 
+	//effective distance (ratio of distance) between two strings
+	levenratio := lvs.RatioForStrings([]rune(o1.name), []rune(o2.name), lvs.DefaultOptions)
+
 	// vecs should only be normed after diff is calculated
+	out["LVS_RATIO"] = levenratio
 	out["VEC_DIFF"], _ = diff(o1.vec, o2.vec)
 	out["map"] = 0
+	out["X_IN_Y"] = 0.
+	if strings.Contains(strings.ToLower(o1.name), strings.ToLower(o2.name)) {
+		out["X_IN_Y"] = 1.
+	}
+	out["Y_IN_X"] = 0.
+	if strings.Contains(strings.ToLower(o2.name), strings.ToLower(o1.name)) {
+		out["Y_IN_X"] = 1.
+	}
 
 	if !o1.vecsNormed {
 		o1 = o1.norming()

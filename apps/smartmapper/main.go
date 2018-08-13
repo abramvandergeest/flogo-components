@@ -21,6 +21,7 @@ import (
 var (
 	httpport  = os.Getenv("HTTPPORT")
 	modelPath = os.Getenv("SMMODEL")
+	//GLOVEFILE defined in preprocess.go
 )
 
 func main() {
@@ -116,6 +117,12 @@ func handler(ctx context.Context, inputs map[string]*data.Attribute) (map[string
 			fmt.Println(s)
 			listofcomps = append(listofcomps, s)
 			output2[obja.name] = append(output2[obja.name], outrow{TargetName: objb.name, Match: float64(mapProb)})
+
+			//YOU CAN USE THIS PORTION TO CREATE LABELED DATA, COPY PASTE THE PRINTED LINES AND ADD 1/0 FOR THE LABEL
+			// if mapProb > 0.5 {
+			fmt.Printf("%s,%s,%s,%s,%d,%d,%s,%s,\n", obja.fieldType, objb.fieldType,
+				obja.label, objb.label, obja.fieldLength, objb.fieldLength, obja.name, objb.name)
+			// }
 
 		}
 		output[obja.name] = listofcomps
