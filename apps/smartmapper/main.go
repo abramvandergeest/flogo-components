@@ -120,8 +120,8 @@ func handler(ctx context.Context, inputs map[string]*data.Attribute) (map[string
 
 			//YOU CAN USE THIS PORTION TO CREATE LABELED DATA, COPY PASTE THE PRINTED LINES AND ADD 1/0 FOR THE LABEL
 			// if mapProb > 0.5 {
-			fmt.Printf("%s,%s,%s,%s,%d,%d,%s,%s,\n", obja.fieldType, objb.fieldType,
-				obja.label, objb.label, obja.fieldLength, objb.fieldLength, obja.name, objb.name)
+			// 	fmt.Printf("%s,%s,%s,%s,%d,%d,%s,%s,\n", obja.fieldType, objb.fieldType,
+			// 		obja.label, objb.label, obja.fieldLength, objb.fieldLength, obja.name, objb.name)
 			// }
 
 		}
