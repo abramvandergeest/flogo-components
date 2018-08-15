@@ -3,6 +3,7 @@
   "version": "0.0.1",
   "type": "flogo:activity",
   "description": "activity description",
+  "ref": "github.com/abramvandergeest/flogo-components/activity/featureprep"
   "author": "Your Name <you.name@example.org>",
   "inputs":[
     {
