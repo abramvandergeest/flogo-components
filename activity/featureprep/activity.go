@@ -37,11 +37,12 @@ func (a *MyActivity) Eval(context activity.Context) (done bool, err error) {
 	outobject := make(map[string]interface{})
 
 	// do eval
-	inputs := context.GetInput("input").([][]float64)
+	// inputs := context.GetInput("input").([][]float64)
+	inputs := context.GetInput("input").([]interface{})
 
 	li := len(inputs)
-	fmt.Println(inputs)
-	for i, ivec := range inputs {
+	for i, iint := range inputs {
+		ivec := iint.([]float64)
 		ind := li - i - 1
 		for j := 0; j < len(ivec); j++ {
 			outobject[strconv.Itoa(j)+"_"+strconv.Itoa(ind)] = ivec[j]
