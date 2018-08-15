@@ -1,7 +1,6 @@
 package featureprep
 
 import (
-	"fmt"
 	"math"
 	"strconv"
 
@@ -46,10 +45,10 @@ func (a *MyActivity) Eval(context activity.Context) (done bool, err error) {
 		ind := li - i - 1
 		for j := 0; j < len(ivec); j++ {
 			outobject[strconv.Itoa(j)+"_"+strconv.Itoa(ind)] = ivec[j]
-			fmt.Println(strconv.Itoa(j)+"_"+strconv.Itoa(ind), ivec[j])
+			// fmt.Println(strconv.Itoa(j)+"_"+strconv.Itoa(ind), ivec[j])
 		}
 		outobject["amag_"+strconv.Itoa(ind)] = magnitude(ivec)
-		fmt.Println("amag_"+strconv.Itoa(ind), magnitude(ivec))
+		// fmt.Println("amag_"+strconv.Itoa(ind), magnitude(ivec))
 	}
 
 	// fmt.Println(outobject)
