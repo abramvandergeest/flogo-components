@@ -145,17 +145,17 @@ func diff(svec []float64, tvec []float64) (mag float64, err error) {
 // Above is functions not dependant on activity structure, below are
 //Creating a structure for the source and target of a mapping
 type objectField struct {
-	name        string
-	label       string
-	fieldType   string
-	fieldLength int32
+	Name        string `json:"name"`
+	Label       string `json:"label"`
+	FieldType   string `json:"type"`
+	FieldLength int32  `json:"type_length"`
 	vec         []float64
 	vecsNormed  bool
 }
 
 // assigned an embedding value to an objectField
 func (oF objectField) embedding() objectField {
-	oF.vec = getembed(oF.label)
+	oF.vec = getembed(oF.Label)
 	return oF
 }
 
@@ -183,18 +183,18 @@ func objs2features(o1 objectField, o2 objectField) map[string]interface{} { // o
 	out := make(map[string]interface{})
 
 	//effective distance (ratio of distance) between two strings
-	levenratio := lvs.RatioForStrings([]rune(o1.name), []rune(o2.name), lvs.DefaultOptions)
+	levenratio := lvs.RatioForStrings([]rune(o1.Name), []rune(o2.Name), lvs.DefaultOptions)
 
 	// vecs should only be normed after diff is calculated
 	out["LVS_RATIO"] = levenratio
 	out["VEC_DIFF"], _ = diff(o1.vec, o2.vec)
 	out["map"] = 0
 	out["X_IN_Y"] = 0.
-	if strings.Contains(strings.ToLower(o1.name), strings.ToLower(o2.name)) {
+	if strings.Contains(strings.ToLower(o1.Name), strings.ToLower(o2.Name)) {
 		out["X_IN_Y"] = 1.
 	}
 	out["Y_IN_X"] = 0.
-	if strings.Contains(strings.ToLower(o2.name), strings.ToLower(o1.name)) {
+	if strings.Contains(strings.ToLower(o2.Name), strings.ToLower(o1.Name)) {
 		out["Y_IN_X"] = 1.
 	}
 
@@ -234,10 +234,10 @@ func jsonStr2Obj(str string) (out []objectField, err error) {
 	}
 	for _, a := range data {
 		o := objectField{
-			name:        a["name"].(string),
-			label:       a["label"].(string),
-			fieldType:   a["type"].(string),
-			fieldLength: int32(a["type_length"].(float64))}
+			Name:        a["name"].(string),
+			Label:       a["label"].(string),
+			FieldType:   a["type"].(string),
+			FieldLength: int32(a["type_length"].(float64))}
 		out = append(out, o)
 	}
 	return out, nil

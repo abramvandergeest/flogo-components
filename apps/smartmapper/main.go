@@ -6,15 +6,14 @@ import (
 	"fmt"
 	"os"
 	"strconv"
-	"strings"
 
 	"github.com/TIBCOSoftware/flogo-contrib/activity/inference"
-	"github.com/TIBCOSoftware/flogo-contrib/activity/log"
 	rt "github.com/TIBCOSoftware/flogo-contrib/trigger/rest"
 	"github.com/TIBCOSoftware/flogo-lib/core/data"
 	"github.com/TIBCOSoftware/flogo-lib/engine"
 	"github.com/TIBCOSoftware/flogo-lib/flogo"
 	"github.com/TIBCOSoftware/flogo-lib/logger"
+	// "github.com/abramvandergeest/flogo-components/activity/inference"
 	// "github.com/abramvandergeest/flogo-components/activity/inference"
 )
 
@@ -57,37 +56,14 @@ func appBuilder() *flogo.App {
 
 func handler(ctx context.Context, inputs map[string]*data.Attribute) (map[string]*data.Attribute, error) {
 
-	//Getting source objects from json string - after cleaning/normalizing the strings
-	s := strings.Map(normStr, inputs["queryParams"].Value().(map[string]string)["Source"])
-	// fmt.Println(s)
-	srcobjs, err := jsonStr2Obj(s)
-	if err != nil {
-		return nil, err
-	}
+	//Getting source objects as []interface{} from POST body
 
-	//Getting target objects from json string - after cleaning/normalizing the strings
-	s = strings.Map(normStr, inputs["queryParams"].Value().(map[string]string)["Target"])
-	// fmt.Println(s)
-	trgobjs, err := jsonStr2Obj(s)
-	if err != nil {
-		return nil, err
-	}
-
-	// Get the ID from the path
-	id := inputs["queryParams"].Value().(map[string]string)["id"]
-
-	// Execute the log activity
-	// // // // I NEED TO LOG WHAT IS GOING ON!!!!!!
-	in := map[string]interface{}{"message": id, "flowInfo": "true", "addToFlow": "true"}
-	_, err = flogo.EvalActivity(&log.LogActivity{}, in)
-	if err != nil {
-		return nil, err
-	}
+	srcobjs := inputs["content"].Value().(map[string]interface{})["Source"].([]interface{})
+	trgobjs := inputs["content"].Value().(map[string]interface{})["Target"].([]interface{})
 
 	// Creating output variable for catching inference results
 	//   Shape of output is output["sourceName"]={"targetName", "matchProbability"}
-	output := make(map[string][]string)
-	output2 := make(map[string][]interface{})
+	output := make(map[string][]interface{})
 
 	// Defining constant inference values
 	m := modelPath
@@ -96,41 +72,57 @@ func handler(ctx context.Context, inputs map[string]*data.Attribute) (map[string
 
 	//Looping over the source and target objects
 	var features map[string]interface{}
-	for _, obja := range srcobjs {
-		listofcomps := []string{}
-		for _, objb := range trgobjs {
+	for _, ointa := range srcobjs {
+
+		//Converting the interface{} object into a objectField
+		oa := ointa.(map[string]interface{})
+		obja := objectField{
+			Name:        oa["name"].(string),
+			Label:       oa["label"].(string),
+			FieldType:   oa["type"].(string),
+			FieldLength: int32(oa["type_length"].(float64))}
+
+		for _, ointb := range trgobjs {
+			//Converting the interface{} object into a objectField
+			ob := ointb.(map[string]interface{})
+			objb := objectField{
+				Name:        ob["name"].(string),
+				Label:       ob["label"].(string),
+				FieldType:   ob["type"].(string),
+				FieldLength: int32(ob["type_length"].(float64))}
+
+			//Getting vector embeddings
 			obja = obja.embedding()
 			objb = objb.embedding()
 			features = objs2features(obja, objb)
 
-			logger.Info(fmt.Sprintf("sourceName:%s  targetName:%s", obja.name, objb.name))
+			// logger.Info(fmt.Sprintf("sourceName:%s  targetName:%s", obja.Name, objb.Name))
 
 			// Given inputs make inference with ML model
-			in = map[string]interface{}{"model": m, "inputName": inputName, "framework": framework, "features": features}
+			in := map[string]interface{}{"model": m, "inputName": inputName, "framework": framework, "features": features}
 			out, err := flogo.EvalActivity(&inference.InferenceActivity{}, in)
 			if err != nil {
 				return nil, err
 			}
 			mapProb := out["result"].Value().(map[string]interface{})["scores"].([][]float32)[0][1]
-			// orCurrent := outrow{TargetName: objb.name, match: float64(mapProb)}
-			s := fmt.Sprintf(`{"TargetName":"%s","match":%f}`, objb.name, float64(mapProb))
-			fmt.Println(s)
-			listofcomps = append(listofcomps, s)
-			output2[obja.name] = append(output2[obja.name], outrow{TargetName: objb.name, Match: float64(mapProb)})
+
+			//Logging prediction from source and target name
+			s := fmt.Sprintf(`{"SourceName":"%s","TargetName":"%s","match":%f}`, obja.Name, objb.Name, float64(mapProb))
+			logger.Info(s)
+			output[obja.Name] = append(output[obja.Name], outrow{TargetName: objb.Name, Match: float64(mapProb)})
 
 			//YOU CAN USE THIS PORTION TO CREATE LABELED DATA, COPY PASTE THE PRINTED LINES AND ADD 1/0 FOR THE LABEL
-			// if mapProb > 0.5 {
-			// 	fmt.Printf("%s,%s,%s,%s,%d,%d,%s,%s,\n", obja.fieldType, objb.fieldType,
-			// 		obja.label, objb.label, obja.fieldLength, objb.fieldLength, obja.name, objb.name)
+			// if mapProb > 0.0 { //0.5
+			// 	fmt.Printf("%s,%s,%s,%s,%d,%d,%s,%s,\n", obja.FieldType, objb.FieldType,
+			// 		obja.Label, objb.Label, obja.FieldLength, objb.FieldLength, obja.Name, objb.Name)
 			// }
 
 		}
-		output[obja.name] = listofcomps
 	}
 
 	// The return message is a map[string]*data.Attribute which we'll have to construct
 	response := make(map[string]interface{})
-	response["output"] = output2
+	response["output"] = output
 
 	ret := make(map[string]*data.Attribute)
 	ret["code"], _ = data.NewAttribute("code", data.TypeInteger, 200)
