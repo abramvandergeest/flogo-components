@@ -80,6 +80,9 @@ func TestEval(t *testing.T) {
 	// features["corr-x-y"] = 0.08100326860866637
 
 	features["VEC_DIFF"] = 8.58175
+	features["LVS_RATIO"] = 0.5
+	features["X_IN_Y"] = 1.
+	features["Y_IN_X"] = 0.
 	features["0_x"] = -0.0234164
 	features["0_y"] = 0.128719
 	features["1_x"] = 0.0680591
