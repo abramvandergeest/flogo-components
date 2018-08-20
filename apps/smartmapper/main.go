@@ -7,13 +7,13 @@ import (
 	"os"
 	"strconv"
 
-	"github.com/TIBCOSoftware/flogo-contrib/activity/inference"
+	// "github.com/TIBCOSoftware/flogo-contrib/activity/inference"
 	rt "github.com/TIBCOSoftware/flogo-contrib/trigger/rest"
 	"github.com/TIBCOSoftware/flogo-lib/core/data"
 	"github.com/TIBCOSoftware/flogo-lib/engine"
 	"github.com/TIBCOSoftware/flogo-lib/flogo"
 	"github.com/TIBCOSoftware/flogo-lib/logger"
-	// "github.com/abramvandergeest/flogo-components/activity/inference"
+	"github.com/abramvandergeest/flogo-components/activity/inference"
 	// "github.com/abramvandergeest/flogo-components/activity/inference"
 )
 

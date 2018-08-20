@@ -7,11 +7,11 @@ import (
 var jsonMetadata = `{
   "name": "flogo-inference",
   "type": "flogo:activity",
-  "ref": "github.com/TIBCOSoftware/flogo-contrib/activity/inference",
+  "ref": "github.com/abramvandergeest/flogo-components/activity/inference",
   "version": "0.0.1",
   "title": "Invoke ML Model",
   "description": "Basic inferencing activity to invoke ML model using the flogo-ml framework.",
-  "homepage": "https://github.com/TIBCOSoftware/flogo-contrib/tree/master/activity/inference",
+  "homepage": "https://github.com/abramvandergeest/flogo-contrib/tree/master/activity/inference",
   "input":[
     {
         "name": "model",
