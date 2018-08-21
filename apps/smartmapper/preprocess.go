@@ -223,6 +223,9 @@ func objs2features(o1 objectField, o2 objectField) map[string]interface{} { // o
 type outrow struct {
 	TargetName string  `json:"targetName"`
 	Match      float64 `json:"match"`
+	Label      string  `json:"label"`
+	Type       string  `json:"type"`
+	TypeLength int32   `json:"type_length"`
 }
 
 func jsonStr2Obj(str string) (out []objectField, err error) {

@@ -109,7 +109,15 @@ func handler(ctx context.Context, inputs map[string]*data.Attribute) (map[string
 			//Logging prediction from source and target name
 			s := fmt.Sprintf(`{"SourceName":"%s","TargetName":"%s","match":%f}`, obja.Name, objb.Name, float64(mapProb))
 			logger.Info(s)
-			output[obja.Name] = append(output[obja.Name], outrow{TargetName: objb.Name, Match: float64(mapProb)})
+			output[obja.Name] = append(output[obja.Name],
+				outrow{
+					TargetName: objb.Name,
+					Match:      float64(mapProb),
+					Label:      objb.Label,
+					Type:       objb.FieldType,
+					TypeLength: objb.FieldLength,
+				},
+			)
 
 			//YOU CAN USE THIS PORTION TO CREATE LABELED DATA, COPY PASTE THE PRINTED LINES AND ADD 1/0 FOR THE LABEL
 			// if mapProb > 0.0 { //0.5
