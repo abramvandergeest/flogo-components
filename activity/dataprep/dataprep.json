@@ -1,0 +1,12 @@
+{
+	"input": {
+		"type": "object",
+		"shape": "[11][3]float64"
+	},
+	"operations": [],
+	"output": {
+		"type": "object",
+		"shape": "[11][3]float64",
+		"struct": "input"
+	}
+}
