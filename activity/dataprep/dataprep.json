@@ -7,6 +7,6 @@
 	"output": {
 		"type": "object",
 		"shape": "[11][3]float64",
-		"struct": "input"
+		"build": "input"
 	}
 }
