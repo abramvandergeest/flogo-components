@@ -59,26 +59,34 @@ func (a *MyActivity) Metadata() *activity.Metadata {
 	return a.metadata
 }
 
-// Eval implements activity.Activity.Eval
-func (a *MyActivity) Eval(context activity.Context) (done bool, err error) {
-
-	filename := "dataprep.json"
-
+func readInJSON(filename string) (JSONObject, error) {
+	// Reading json and putting it into variable
 	file, err := os.Open(filename)
 	if err != nil {
 		log.Errorf("Can't open file %s", filename)
-		return false, err
+		return JSONObject{}, err
 	}
 	defer file.Close()
 
 	byteValue, err := ioutil.ReadAll(file)
 	if err != nil {
 		log.Errorf("Cannot read dataprep.json into bytes")
+		return JSONObject{}, err
 	}
-
+	// Defining json varable
 	var injson JSONObject
 	json.Unmarshal(byteValue, &injson)
+	return injson, err
+}
 
+// Eval implements activity.Activity.Eval
+func (a *MyActivity) Eval(context activity.Context) (done bool, err error) {
+
+	filename := "dataprep.json"
+
+	injson, err := readInJSON(filename)
+
+	// creating maps to hold value and dimensions oftotal namespace
 	nameSpace := make(map[string]interface{})
 	dimSpace := make(map[string]interface{})
 
