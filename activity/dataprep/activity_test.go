@@ -1,11 +1,12 @@
 package dataprep
 
 import (
+	"fmt"
 	"io/ioutil"
 	"testing"
 
-	"github.com/TIBCOSoftware/flogo-lib/core/activity"
 	"github.com/TIBCOSoftware/flogo-contrib/action/flow/test"
+	"github.com/TIBCOSoftware/flogo-lib/core/activity"
 )
 
 var activityMetadata *activity.Metadata
@@ -14,7 +15,7 @@ func getActivityMetadata() *activity.Metadata {
 
 	if activityMetadata == nil {
 		jsonMetadataBytes, err := ioutil.ReadFile("activity.json")
-		if err != nil{
+		if err != nil {
 			panic("No Json Metadata found for activity.json path")
 		}
 
@@ -46,6 +47,11 @@ func TestEval(t *testing.T) {
 
 	act := NewActivity(getActivityMetadata())
 	tc := test.NewTestActivityContext(getActivityMetadata())
+
+	blah := [][]interface{}{{11.1, 12.1, 13.1}, {1.1, 2.3, 3.1}}
+	fmt.Println("blah", blah)
+	tc.SetInput("input", blah)
+	fmt.Println("input", tc.GetInput("input"))
 
 	//setup attrs
 

@@ -1,12 +1,40 @@
 {
 	"input": {
-		"type": "object",
-		"shape": "[11][3]float64"
+		"type": "array",
+		"dimensions": 2
 	},
-	"operations": [],
+	"operations": [
+                  {
+                    "input":"input",
+                    "fnname":"rename",
+                    "label":"renamed"
+                  },
+                  {
+                    "input":"renamed",
+                    "fnname":"magnitude",
+                    "label":"mag"
+                  },
+                  {
+                    "inputs":["renamed","mag"],
+                    "fnname":"addCol2Tab",
+                    "label":"accel"
+                  },
+                  {
+                    "input":"accel",
+                    "fnname":"flatten",
+                    "label":"flat"
+                  },
+                  {
+                    "input":"flat",
+                    "fnname":"toMap",
+                    "list":["0_0","1_0","2_0","amag_0","0_1","1_1","2_1","amag_1"],
+                    "label":"finalout"
+                  }
+
+
+             ],
 	"output": {
 		"type": "object",
-		"shape": "[11][3]float64",
-		"build": "input"
+		"outvar": "finalout"
 	}
 }

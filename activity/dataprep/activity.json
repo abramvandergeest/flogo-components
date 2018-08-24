@@ -7,13 +7,13 @@
   "inputs":[
     {
       "name": "input",
-      "type": "string"
+      "type": "array"
     }
   ],
   "outputs": [
     {
       "name": "output",
-      "type": "string"
+      "type": "object"
     }
   ]
 }
