@@ -3,11 +3,15 @@
   "version": "0.0.1",
   "type": "flogo:activity",
   "description": "activity description",
-  "author": "Your Name <you.name@example.org>",
+  "author": "Abram Van Der Gest <avanderg@tibco.com>",
   "inputs":[
     {
       "name": "input",
       "type": "array"
+    },
+    {
+      "name": "jsonfile",
+      "type": "string"
     }
   ],
   "outputs": [

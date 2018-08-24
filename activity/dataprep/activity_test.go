@@ -51,6 +51,7 @@ func TestEval(t *testing.T) {
 	blah := [][]interface{}{{11.1, 12.1, 13.1}, {1.1, 2.3, 3.1}}
 	fmt.Println("blah", blah)
 	tc.SetInput("input", blah)
+	tc.SetInput("jsonfile", "dataprep.json")
 	fmt.Println("input", tc.GetInput("input"))
 
 	//setup attrs

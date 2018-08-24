@@ -82,7 +82,12 @@ func readInJSON(filename string) (JSONObject, error) {
 // Eval implements activity.Activity.Eval
 func (a *MyActivity) Eval(context activity.Context) (done bool, err error) {
 
-	filename := "dataprep.json"
+	var filename string
+	if context.GetInput("jsonfile") == "" {
+		filename = "dataprep.json"
+	} else {
+		filename = context.GetInput("jsonfile").(string)
+	}
 
 	injson, err := readInJSON(filename)
 
