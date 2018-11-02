@@ -7,13 +7,13 @@ import (
 	"os"
 	"strconv"
 
-	// "github.com/TIBCOSoftware/flogo-contrib/activity/inference"
+	"github.com/TIBCOSoftware/flogo-contrib/activity/inference"
 	rt "github.com/TIBCOSoftware/flogo-contrib/trigger/rest"
 	"github.com/TIBCOSoftware/flogo-lib/core/data"
 	"github.com/TIBCOSoftware/flogo-lib/engine"
 	"github.com/TIBCOSoftware/flogo-lib/flogo"
 	"github.com/TIBCOSoftware/flogo-lib/logger"
-	"github.com/abramvandergeest/flogo-components/activity/inference"
+	// "github.com/abramvandergeest/flogo-components/activity/inference"
 	// "github.com/abramvandergeest/flogo-components/activity/inference"
 )
 
@@ -67,11 +67,13 @@ func handler(ctx context.Context, inputs map[string]*data.Attribute) (map[string
 
 	// Defining constant inference values
 	m := modelPath
+	fmt.Println(m)
 	inputName := "inputs"
 	framework := "Tensorflow"
 
 	//Looping over the source and target objects
-	var features map[string]interface{}
+	var features []interface{}
+
 	for _, ointa := range srcobjs {
 
 		//Converting the interface{} object into a objectField
@@ -94,7 +96,10 @@ func handler(ctx context.Context, inputs map[string]*data.Attribute) (map[string
 			//Getting vector embeddings
 			obja = obja.embedding()
 			objb = objb.embedding()
-			features = objs2features(obja, objb)
+			features = append(features, map[string]interface{}{
+				"name": "inputs",
+				"data": objs2features(obja, objb),
+			})
 
 			// logger.Info(fmt.Sprintf("sourceName:%s  targetName:%s", obja.Name, objb.Name))
 
@@ -104,7 +109,7 @@ func handler(ctx context.Context, inputs map[string]*data.Attribute) (map[string
 			if err != nil {
 				return nil, err
 			}
-			mapProb := out["result"].Value().(map[string]interface{})["scores"].([][]float32)[0][1]
+			mapProb := out["result"].Value().(map[string]interface{})["Mapping"].(float32)
 
 			//Logging prediction from source and target name
 			s := fmt.Sprintf(`{"SourceName":"%s","TargetName":"%s","match":%f}`, obja.Name, objb.Name, float64(mapProb))

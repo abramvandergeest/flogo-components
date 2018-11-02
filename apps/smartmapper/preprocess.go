@@ -84,7 +84,7 @@ func loadGloveModel(gfile string) map[string][]float64 {
 }
 
 // Defining basic values for glove file
-var gfile = os.Getenv("GLOVEFILE") //"/Users/avanders/glove/glove_twitter/glove.twitter.27B.25d.txt"
+var gfile = os.Getenv("GLOVEFILE") //"/Users/avanderg@tibco.com/glove/glove_twitter/glove.twitter.27B.25d.txt"
 
 // const dim int = 25
 
