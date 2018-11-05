@@ -4,8 +4,6 @@ package main
 import (
 	"context"
 	"fmt"
-	"image"
-	"image/png"
 	"os"
 	"strconv"
 
@@ -15,6 +13,11 @@ import (
 	"github.com/TIBCOSoftware/flogo-lib/engine"
 	"github.com/TIBCOSoftware/flogo-lib/flogo"
 	"github.com/TIBCOSoftware/flogo-lib/logger"
+	"github.com/harrydb/go/img/grayscale"
+
+	// "github.com/harrydb/go/img/grayscale"
+	// "github.com/nfnt/resize"
+	"github.com/disintegration/imaging"
 )
 
 var (
@@ -58,112 +61,58 @@ func handler(ctx context.Context, inputs map[string]*data.Attribute) (map[string
 	//Getting source objects as []interface{} from POST body
 	fmt.Println("Gets Triggered.")
 
-	blah := inputs["content"].Value().(map[string]interface{})["Input"] //.(int32)
-	fmt.Println(blah)
+	// blah := inputs["content"].Value().(map[string]interface{})["Input"] //.(int32)
+	// fmt.Println(blah)
 	// trgobjs := inputs["content"].Value().(map[string]interface{})["Target"].([]interface{})
 
-	filename := "/Users/avanderg@tibco.com/Desktop/Touch Bar Shot 2018-10-30 at 3.51.06 PM.png"
-	infile, err := os.Open(filename)
-	if err != nil {
-		return nil, err
-	}
-	defer infile.Close()
+	filename := "/Users/avanderg@tibco.com/datasets/box_images/Box/boxes/google-image(0060).jpeg"
+	src, err := imaging.Open(filename)
 
-	src, _, err2 := image.Decode(infile)
-	if err2 != nil {
-		return nil, err2
+	imgsize := 256
+	src = imaging.Resize(src, imgsize, imgsize, imaging.Lanczos)
+	src = imaging.Grayscale(src)
+	src = grayscale.Convert(src, grayscale.ToGrayLuminance)
+
+	var flatimg []float32
+	for x := 0; x < imgsize; x++ {
+		for y := 0; y < imgsize; y++ {
+			imageColor := src.At(x, y)
+			rr, _, _, _ := imageColor.RGBA()
+			gray := float32(rr) / 65535.
+			flatimg = append(flatimg, gray)
+
+		}
 	}
+
 	m := modelPath
 	framework := "Tensorflow"
 	var features []interface{}
 	features = append(features, map[string]interface{}{
-		"name": "inputs",
-		"data": 2,
+		"name": "xs",
+		"data": flatimg,
 	})
 
 	in := map[string]interface{}{"model": m, "framework": framework, "features": features}
-	fmt.Println(in["model"])
+	// fmt.Println(in["model"])
 
 	out, err := flogo.EvalActivity(&inference.InferenceActivity{}, in)
 	if err != nil {
 		return nil, err
 	}
+	mapProb := out["result"].Value().(map[string]interface{})["prediction"].([][]float32)
+	// fmt.Println(out, mapProb)
 
-	fmt.Println(out)
-
-	outfile, err := os.Create("Blah.png")
-	if err != nil {
-		return nil, err
-	}
-	defer outfile.Close()
-	png.Encode(outfile, src)
+	// outfile, err := os.Create("Blah.jpeg")
+	// if err != nil {
+	// 	return nil, err
+	// }
+	// defer outfile.Close()
+	// jpeg.Encode(outfile, src, &jpeg.Options{Quality: 100})
 
 	// Creating output variable for catching inference results
 	//   Shape of output is output["sourceName"]={"targetName", "matchProbability"}
-	output := make(map[string][]interface{})
-
-	// // Defining constant inference values
-	// m := modelPath
-	// inputName := "inputs"
-	// framework := "Tensorflow"
-
-	// //Looping over the source and target objects
-	// var features map[string]interface{}
-	// for _, ointa := range srcobjs {
-
-	// 	//Converting the interface{} object into a objectField
-	// 	oa := ointa.(map[string]interface{})
-	// 	obja := objectField{
-	// 		Name:        oa["name"].(string),
-	// 		Label:       oa["label"].(string),
-	// 		FieldType:   oa["type"].(string),
-	// 		FieldLength: int32(oa["type_length"].(float64))}
-
-	// 	for _, ointb := range trgobjs {
-	// 		//Converting the interface{} object into a objectField
-	// 		ob := ointb.(map[string]interface{})
-	// 		objb := objectField{
-	// 			Name:        ob["name"].(string),
-	// 			Label:       ob["label"].(string),
-	// 			FieldType:   ob["type"].(string),
-	// 			FieldLength: int32(ob["type_length"].(float64))}
-
-	// 		//Getting vector embeddings
-	// 		obja = obja.embedding()
-	// 		objb = objb.embedding()
-	// 		features = objs2features(obja, objb)
-
-	// 		// logger.Info(fmt.Sprintf("sourceName:%s  targetName:%s", obja.Name, objb.Name))
-
-	// 		// Given inputs make inference with ML model
-	// 		in := map[string]interface{}{"model": m, "inputName": inputName, "framework": framework, "features": features}
-	// 		out, err := flogo.EvalActivity(&inference.InferenceActivity{}, in)
-	// 		if err != nil {
-	// 			return nil, err
-	// 		}
-	// 		mapProb := out["result"].Value().(map[string]interface{})["scores"].([][]float32)[0][1]
-
-	// 		//Logging prediction from source and target name
-	// 		s := fmt.Sprintf(`{"SourceName":"%s","TargetName":"%s","match":%f}`, obja.Name, objb.Name, float64(mapProb))
-	// 		logger.Info(s)
-	// 		output[obja.Name] = append(output[obja.Name],
-	// 			outrow{
-	// 				TargetName: objb.Name,
-	// 				Match:      float64(mapProb),
-	// 				Label:      objb.Label,
-	// 				Type:       objb.FieldType,
-	// 				TypeLength: objb.FieldLength,
-	// 			},
-	// 		)
-
-	// 		//YOU CAN USE THIS PORTION TO CREATE LABELED DATA, COPY PASTE THE PRINTED LINES AND ADD 1/0 FOR THE LABEL
-	// 		// if mapProb > 0.0 { //0.5
-	// 		// 	fmt.Printf("%s,%s,%s,%s,%d,%d,%s,%s,\n", obja.FieldType, objb.FieldType,
-	// 		// 		obja.Label, objb.Label, obja.FieldLength, objb.FieldLength, obja.Name, objb.Name)
-	// 		// }
-
-	// 	}
-	// }
+	// output := make(map[string][]interface{})
+	output := mapProb[0][0]
 
 	// The return message is a map[string]*data.Attribute which we'll have to construct
 	response := make(map[string]interface{})
