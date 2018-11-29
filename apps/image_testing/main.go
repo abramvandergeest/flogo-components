@@ -18,6 +18,7 @@ import (
 	// "github.com/harrydb/go/img/grayscale"
 	// "github.com/nfnt/resize"
 	"github.com/disintegration/imaging"
+	tf "github.com/tensorflow/tensorflow/tensorflow/go"
 )
 
 var (
@@ -84,12 +85,17 @@ func handler(ctx context.Context, inputs map[string]*data.Attribute) (map[string
 		}
 	}
 
+	flatimgout, err := tf.NewTensor(flatimg)
+	if err != nil {
+		return nil, err
+	}
+
 	m := modelPath
 	framework := "Tensorflow"
 	var features []interface{}
 	features = append(features, map[string]interface{}{
 		"name": "xs",
-		"data": flatimg,
+		"data": flatimgout,
 	})
 
 	in := map[string]interface{}{"model": m, "framework": framework, "features": features}
